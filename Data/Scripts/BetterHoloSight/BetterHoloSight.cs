@@ -16,35 +16,47 @@ using BlendTypeEnum = VRageRender.MyBillboard.BlendTypeEnum; // HACK bypass non-
 
 namespace Digi.BetterHoloSight
 {
+    // This class is be used to simulate a holographic sight.
+    // Usage:
+    //   Rifle model needs to have a dummy named holosight_rectangle or holosight_circle depending on what shape it needs to limit within.
+    //   Its shape should be either volumetric box or sphere to help visualize it better.
+    //   The position and size of it will determine the window which the reticle can be seen through, image reference: https://i.imgur.com/4NS5w2K.png
+    //   Dummy's center, width and height are used for rectangle type and its center and width are used for circle type.
+    //   After that, this script needs to be edited in SetupGuns() to add the rifles you want to affect.
+
     [MySessionComponentDescriptor(MyUpdateOrder.NoUpdate)]
     public class BetterHoloSightMod : MySessionComponentBase
     {
         private void SetupGuns()
         {
+            // physical item's subtypeId
             AddGun("PreciseAutomaticRifleItem", new DrawSettings()
             {
-                //ReticleMaterial = MyStringId.GetOrCompute("BetterRedDotSight_Reticle"),
+                // uncomment/add things you wanna change only for this gun, otherwise it'll use the defaults from DrawSettings.
+
+                //ReticleMaterial = MyStringId.GetOrCompute("BetterHoloSight_Reticle"),
                 //ReticleColor = new Color(255, 0, 0).ToVector4() * 2,
                 //ReticleSize = 0.008f,
                 //FadeStartRatio = 0.5,
-                ReplaceModel = @"Models\PrecisionRifle.mwm",
+                ReplaceModel = @"Models\Weapons\PrecisionRifle.mwm",
             });
 
             AddGun("UltimateAutomaticRifleItem", new DrawSettings()
             {
                 ReticleColor = new Color(0, 255, 0).ToVector4() * 1,
                 ReticleSize = 0.01f,
-                ReplaceModel = @"Models\UltimateRifle.mwm",
+                ReplaceModel = @"Models\Weapons\UltimateRifle.mwm",
             });
         }
 
         private class DrawSettings
         {
-            public MyStringId ReticleMaterial = MyStringId.GetOrCompute("BetterRedDotSight_Reticle");
-            public Vector4 ReticleColor = new Color(255, 0, 0).ToVector4() * 2;
-            public float ReticleSize = 0.008f;
-            public double FadeStartRatio = 0.5;
-            public string ReplaceModel = null; // won't replace model by default
+            // editing these affects defaults
+            public MyStringId ReticleMaterial = MyStringId.GetOrCompute("BetterHoloSight_Reticle"); // material from TransparentMaterials SBC.
+            public Vector4 ReticleColor = new Color(255, 0, 0).ToVector4() * 2; // color R,G,B; the multiplication at the end increases intensity
+            public float ReticleSize = 0.008f; // size in meters, needs to be pretty tiny.
+            public double FadeStartRatio = 0.8; // angle % at which it starts to fade. 0 means it starts fading as soon as it's not centered; 1 means effectively no fading.
+            public string ReplaceModel = null; // replace the rifle's model with a model from the current mod, useful for modifying vanilla rifles or other mods' without redefining their definition.
 
             // caching stuff, not for editing
             internal bool Processed = false;
@@ -54,10 +66,15 @@ namespace Digi.BetterHoloSight
             internal double MaxAngleV;
         }
 
+        // not for editing below this point
+
         private const float MAX_VIEW_DIST_SQ = 5 * 5;
+        private const double RETICLE_FRONT_OFFSET = 0.25;
+        private const double PROJECTED_DISTANCE = 400; // if this is too large it will cause errors on the angle calculations
         private const BlendTypeEnum RETICLE_BLEND_TYPE = BlendTypeEnum.SDR;
-        private const string DUMMY_PREFIX = "reddotsight";
-        private const string DUMMY_SQUARE_SUFFIX = "_square";
+
+        private const string DUMMY_PREFIX = "holosight";
+        private const string DUMMY_RECTANGLE_SUFFIX = "_rectangle";
         private const string DUMMY_CIRCLE_SUFFIX = "_circle";
 
         private List<DrawData> drawInfo;
@@ -67,7 +84,7 @@ namespace Digi.BetterHoloSight
         private enum SightType
         {
             Unknown = 0,
-            Square,
+            Rectangle,
             Circle,
         }
 
@@ -85,7 +102,7 @@ namespace Digi.BetterHoloSight
 
         public override void LoadData()
         {
-            Log.ModName = "Better Red Dot";
+            Log.ModName = "Better Holo Sight";
 
             if(MyAPIGateway.Utilities.IsDedicated)
                 return;
@@ -179,21 +196,19 @@ namespace Digi.BetterHoloSight
                         var dummyMatrix = dummy.Matrix;
                         var gunMatrix = ent.WorldMatrix;
 
-                        var reticlePositionLocal = dummyMatrix.Translation + dummyMatrix.Backward * 0.5f;
-                        var reticlePosition = Vector3D.Transform(reticlePositionLocal, gunMatrix);
+                        var reticleProjectedPosition = Vector3D.Transform(dummyMatrix.Translation, gunMatrix) + gunMatrix.Forward * PROJECTED_DISTANCE;
+                        var sightPositionLocal = dummyMatrix.Translation;
 
-                        var sightPositionLocal = dummyMatrix.Translation + dummyMatrix.Forward * 0.5f;
-
-                        if(dummy.Name.EndsWith(DUMMY_SQUARE_SUFFIX))
+                        if(dummy.Name.EndsWith(DUMMY_RECTANGLE_SUFFIX))
                         {
-                            settings.Type = SightType.Square;
+                            settings.Type = SightType.Rectangle;
 
                             var edgePosH = Vector3D.Transform(sightPositionLocal + dummyMatrix.Left * 0.5f, gunMatrix);
-                            var reticleToEdgePosH = Vector3D.Normalize(reticlePosition - edgePosH);
+                            var reticleToEdgePosH = Vector3D.Normalize(reticleProjectedPosition - edgePosH);
                             settings.MaxAngleH = Math.Acos(Vector3D.Dot(gunMatrix.Forward, reticleToEdgePosH));
 
                             var edgePosV = Vector3D.Transform(sightPositionLocal + dummyMatrix.Up * 0.5f, gunMatrix);
-                            var reticleToEdgePosV = Vector3D.Normalize(reticlePosition - edgePosV);
+                            var reticleToEdgePosV = Vector3D.Normalize(reticleProjectedPosition - edgePosV);
                             settings.MaxAngleV = Math.Acos(Vector3D.Dot(gunMatrix.Forward, reticleToEdgePosV));
                         }
                         else if(dummy.Name.EndsWith(DUMMY_CIRCLE_SUFFIX))
@@ -201,12 +216,13 @@ namespace Digi.BetterHoloSight
                             settings.Type = SightType.Circle;
 
                             var edgePos = Vector3D.Transform(sightPositionLocal + dummyMatrix.Left * 0.5f, gunMatrix);
-                            var reticleToEdgePos = Vector3D.Normalize(reticlePosition - edgePos);
+                            var reticleToEdgePos = Vector3D.Normalize(reticleProjectedPosition - edgePos);
                             settings.MaxAngleH = Math.Acos(Vector3D.Dot(gunMatrix.Forward, reticleToEdgePos));
                         }
                         else
                         {
-                            throw new Exception("Unsupported dummy suffix: " + dummy.Name);
+                            Log.Error($"{physItemId.SubtypeName} has unsupported dummy suffix: {dummy.Name}", Log.PRINT_MSG);
+                            return;
                         }
 
                         settings.DummyMatrix = dummy.Matrix;
@@ -254,8 +270,7 @@ namespace Digi.BetterHoloSight
 
                     var dummyMatrix = settings.DummyMatrix; // scaled exactly like the dummy from the model
 
-                    var reticlePositionLocal = dummyMatrix.Translation + dummyMatrix.Backward * 0.5f;
-                    var reticlePosition = Vector3D.Transform(reticlePositionLocal, gunMatrix);
+                    var reticleProjectedPosition = Vector3D.Transform(dummyMatrix.Translation, gunMatrix) + gunMatrix.Forward * PROJECTED_DISTANCE;
 
                     //if(IsLocalPlayerAimingThisGun(data.Entity))
                     //{
@@ -264,34 +279,45 @@ namespace Digi.BetterHoloSight
                     //    continue;
                     //}
 
-                    var sightPositionLocal = dummyMatrix.Translation + dummyMatrix.Forward * 0.5f;
-                    var sightPosition = Vector3D.Transform(sightPositionLocal, gunMatrix);
+                    var sightPosition = Vector3D.Transform(dummyMatrix.Translation, gunMatrix);
 
                     var fwOffsetDot = gunMatrix.Forward.Dot(sightPosition - camMatrix.Translation);
                     if(fwOffsetDot < 0)
                         continue; // camera is ahead of sight, don't draw reticle
 
-                    if(settings.Type == SightType.Square)
+                    if(settings.Type == SightType.Rectangle)
                     {
-                        var dirNormalized = Vector3D.Normalize(reticlePosition - camMatrix.Translation);
-                        double angleH = Math.Abs(Math.Acos(Vector3D.Dot(gunMatrix.Left, dirNormalized)) - (Math.PI / 2)); // subtracting 90deg
-                        double angleV = Math.Abs(Math.Acos(Vector3D.Dot(gunMatrix.Up, dirNormalized)) - (Math.PI / 2));
+                        var camToReticleDir = Vector3D.Normalize(reticleProjectedPosition - camMatrix.Translation);
+                        double angleH = Math.Acos(Vector3D.Dot(gunMatrix.Left, camToReticleDir)) - (Math.PI / 2); // subtracting 90deg
+                        double angleV = Math.Acos(Vector3D.Dot(gunMatrix.Up, camToReticleDir)) - (Math.PI / 2);
+
+                        // simplifies math later on
+                        angleH = Math.Abs(angleH);
+                        angleV = Math.Abs(angleV);
 
                         if(angleH < settings.MaxAngleH && angleV < settings.MaxAngleV)
                         {
                             var alphaH = GetAlphaForAngle(settings.FadeStartRatio, angleH, settings.MaxAngleH);
                             var alphaV = GetAlphaForAngle(settings.FadeStartRatio, angleV, settings.MaxAngleV);
+
+                            var camToSightDistance = Vector3D.Distance(sightPosition, camMatrix.Translation) + RETICLE_FRONT_OFFSET;
+                            var reticlePosition = camMatrix.Translation + (camToReticleDir * camToSightDistance);
+
                             MyTransparentGeometry.AddBillboardOriented(settings.ReticleMaterial, settings.ReticleColor * (alphaH * alphaV), reticlePosition, gunMatrix.Left, gunMatrix.Up, settings.ReticleSize, blendType: RETICLE_BLEND_TYPE);
                         }
                     }
                     else if(settings.Type == SightType.Circle)
                     {
-                        var camToReticleDir = Vector3D.Normalize(reticlePosition - camMatrix.Translation);
+                        var camToReticleDir = Vector3D.Normalize(reticleProjectedPosition - camMatrix.Translation);
                         double angle = Math.Acos(Vector3D.Dot(gunMatrix.Forward, camToReticleDir));
 
                         if(angle < settings.MaxAngleH)
                         {
                             var alpha = GetAlphaForAngle(settings.FadeStartRatio, angle, settings.MaxAngleH);
+
+                            var camToSightDistance = Vector3D.Distance(sightPosition, camMatrix.Translation) + RETICLE_FRONT_OFFSET;
+                            var reticlePosition = camMatrix.Translation + (camToReticleDir * camToSightDistance);
+
                             MyTransparentGeometry.AddBillboardOriented(settings.ReticleMaterial, settings.ReticleColor * alpha, reticlePosition, gunMatrix.Left, gunMatrix.Up, settings.ReticleSize, blendType: RETICLE_BLEND_TYPE);
                         }
                     }
@@ -303,13 +329,13 @@ namespace Digi.BetterHoloSight
             }
         }
 
-        private float GetAlphaForAngle(double fadeRatio, double angle, double boundaryAngle)
+        private float GetAlphaForAngle(double fadeRatio, double absAngle, double boundaryAngle)
         {
             var fadeOutStartAngle = (boundaryAngle * fadeRatio);
 
-            if(angle > fadeOutStartAngle)
+            if(absAngle > fadeOutStartAngle)
             {
-                var amount = (angle - fadeOutStartAngle) / (boundaryAngle - fadeOutStartAngle);
+                var amount = (absAngle - fadeOutStartAngle) / (boundaryAngle - fadeOutStartAngle);
                 return 1f - (float)amount;
             }
 

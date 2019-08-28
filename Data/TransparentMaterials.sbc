@@ -4,7 +4,7 @@
     <TransparentMaterial>
       <Id>
         <TypeId>TransparentMaterialDefinition</TypeId>
-        <SubtypeId>BetterRedDotSight_Reticle</SubtypeId>
+        <SubtypeId>BetterHoloSight_Reticle</SubtypeId>
       </Id>
       <AlphaMistingEnable>false</AlphaMistingEnable>
       <AlphaSaturation>1</AlphaSaturation>
@@ -27,7 +27,7 @@
     <TransparentMaterial>
       <Id>
         <TypeId>TransparentMaterialDefinition</TypeId>
-        <SubtypeId>BetterRedDotSight_Glass</SubtypeId>
+        <SubtypeId>BetterHoloSight_Glass</SubtypeId>
       </Id>      
       <AlphaMistingEnable>false</AlphaMistingEnable>
       <AlphaSaturation>1</AlphaSaturation>

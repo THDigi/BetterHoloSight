@@ -304,10 +304,10 @@ $RECYCLE.BIN/
 
 
 # Blender
-Models/*.fbx
-Models/*.hkt
-Models/*.log
-Models/*.xml
+Models/*/*.fbx
+Models/*/*.hkt
+Models/*/*.log
+Models/*/*.xml
 *.blend1
 *.blend2
 *.blend3
