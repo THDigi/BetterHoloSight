@@ -5,8 +5,8 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <OutputType>Library</OutputType>
-    <RootNamespace>RedDotSight</RootNamespace>
-    <AssemblyName>RedDotSight</AssemblyName>
+    <RootNamespace>BetterHoloSight</RootNamespace>
+    <AssemblyName>BetterHoloSight</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -44,11 +44,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <Prefer32Bit>false</Prefer32Bit>
     <LangVersion>6</LangVersion>
-    <CodeAnalysisRuleSet>Better Red Dot.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>BetterHoloSight.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <Prefer32Bit>false</Prefer32Bit>
-    <CodeAnalysisRuleSet>Better Red Dot.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>BetterHoloSight.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System">
@@ -119,14 +119,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BetterRedDot.cs" />
+    <Compile Include="BetterHoloSight.cs" />
     <Compile Include="Log.cs" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\..\..\..\..\_SharedCode\SEWhitelistChecker.dll" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Better Red Dot.ruleset" />
+    <None Include="BetterHoloSight.ruleset" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -14,10 +14,10 @@ using VRage.Utils;
 using VRageMath;
 using BlendTypeEnum = VRageRender.MyBillboard.BlendTypeEnum; // HACK bypass non-whitelisted MyBillboard to get to the whitelisted BlendTypeEnum
 
-namespace Digi.BetterRedDot
+namespace Digi.BetterHoloSight
 {
     [MySessionComponentDescriptor(MyUpdateOrder.NoUpdate)]
-    public class BetterRedDotMod : MySessionComponentBase
+    public class BetterHoloSightMod : MySessionComponentBase
     {
         private void SetupGuns()
         {
