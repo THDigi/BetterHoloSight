@@ -205,11 +205,11 @@ namespace Digi.BetterHoloSight
 
                             var edgePosH = Vector3D.Transform(sightPositionLocal + dummyMatrix.Left * 0.5f, gunMatrix);
                             var reticleToEdgePosH = Vector3D.Normalize(reticleProjectedPosition - edgePosH);
-                            settings.MaxAngleH = Math.Acos(Vector3D.Dot(gunMatrix.Forward, reticleToEdgePosH));
+                            settings.MaxAngleH = Math.Acos(MathHelper.Clamp(Vector3D.Dot(gunMatrix.Forward, reticleToEdgePosH), -1, 1));
 
                             var edgePosV = Vector3D.Transform(sightPositionLocal + dummyMatrix.Up * 0.5f, gunMatrix);
                             var reticleToEdgePosV = Vector3D.Normalize(reticleProjectedPosition - edgePosV);
-                            settings.MaxAngleV = Math.Acos(Vector3D.Dot(gunMatrix.Forward, reticleToEdgePosV));
+                            settings.MaxAngleV = Math.Acos(MathHelper.Clamp(Vector3D.Dot(gunMatrix.Forward, reticleToEdgePosV), -1, 1));
                         }
                         else if(dummy.Name.EndsWith(DUMMY_CIRCLE_SUFFIX))
                         {
@@ -217,7 +217,7 @@ namespace Digi.BetterHoloSight
 
                             var edgePos = Vector3D.Transform(sightPositionLocal + dummyMatrix.Left * 0.5f, gunMatrix);
                             var reticleToEdgePos = Vector3D.Normalize(reticleProjectedPosition - edgePos);
-                            settings.MaxAngleH = Math.Acos(Vector3D.Dot(gunMatrix.Forward, reticleToEdgePos));
+                            settings.MaxAngleH = Math.Acos(MathHelper.Clamp(Vector3D.Dot(gunMatrix.Forward, reticleToEdgePos), -1, 1));
                         }
                         else
                         {
@@ -288,8 +288,8 @@ namespace Digi.BetterHoloSight
                     if(settings.Type == SightType.Rectangle)
                     {
                         var camToReticleDir = Vector3D.Normalize(reticleProjectedPosition - camMatrix.Translation);
-                        double angleH = Math.Acos(Vector3D.Dot(gunMatrix.Left, camToReticleDir)) - (Math.PI / 2); // subtracting 90deg
-                        double angleV = Math.Acos(Vector3D.Dot(gunMatrix.Up, camToReticleDir)) - (Math.PI / 2);
+                        double angleH = Math.Acos(MathHelper.Clamp(Vector3D.Dot(gunMatrix.Left, camToReticleDir), -1, 1)) - (Math.PI / 2); // subtracting 90deg
+                        double angleV = Math.Acos(MathHelper.Clamp(Vector3D.Dot(gunMatrix.Up, camToReticleDir), -1, 1)) - (Math.PI / 2);
 
                         // simplifies math later on
                         angleH = Math.Abs(angleH);
@@ -309,7 +309,7 @@ namespace Digi.BetterHoloSight
                     else if(settings.Type == SightType.Circle)
                     {
                         var camToReticleDir = Vector3D.Normalize(reticleProjectedPosition - camMatrix.Translation);
-                        double angle = Math.Acos(Vector3D.Dot(gunMatrix.Forward, camToReticleDir));
+                        double angle = Math.Acos(MathHelper.Clamp(Vector3D.Dot(gunMatrix.Forward, camToReticleDir), -1, 1));
 
                         if(angle < settings.MaxAngleH)
                         {
