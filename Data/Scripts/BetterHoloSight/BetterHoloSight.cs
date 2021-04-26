@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using Sandbox.Definitions;
 using Sandbox.Game.Entities;
-using Sandbox.Game.Entities.Character.Components;
 using Sandbox.ModAPI;
 using Sandbox.ModAPI.Weapons;
 using VRage.Game;
@@ -135,7 +134,6 @@ namespace Digi.BetterHoloSight
                     continue;
 
                 MyPhysicalItemDefinition def;
-
                 if(MyDefinitionManager.Static.TryGetPhysicalItemDefinition(kv.Key, out def))
                 {
                     def.Model = Path.Combine(ModContext.ModPath, kv.Value.ReplaceModel);
@@ -148,15 +146,13 @@ namespace Digi.BetterHoloSight
             try
             {
                 var floatingObject = ent as MyFloatingObject;
-
-                if(floatingObject != null)
+                if(floatingObject != null && floatingObject.ItemDefinition != null)
                 {
                     AddSupportedGun(ent, floatingObject.ItemDefinition.Id);
                     return;
                 }
 
                 var handHeldItem = ent as IMyAutomaticRifleGun;
-
                 if(handHeldItem != null)
                 {
                     AddSupportedGun(ent, handHeldItem.PhysicalItemId);
@@ -172,7 +168,6 @@ namespace Digi.BetterHoloSight
         private void AddSupportedGun(IMyEntity ent, MyDefinitionId physItemId)
         {
             DrawSettings settings;
-
             if(!drawSettings.TryGetValue(physItemId, out settings))
                 return;
 
@@ -241,7 +236,6 @@ namespace Digi.BetterHoloSight
             try
             {
                 int count = drawInfo.Count;
-
                 if(count == 0)
                     return;
 
