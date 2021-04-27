@@ -34,7 +34,7 @@ namespace Digi.BetterHoloSight
                 // uncomment/add things you wanna change only for this gun, otherwise it'll use the defaults from DrawSettings.
 
                 //ReticleMaterial = MyStringId.GetOrCompute("BetterHoloSight_Reticle"),
-                //ReticleColor = new Color(255, 0, 0).ToVector4() * 2,
+                //ReticleColor = (new Color(255, 0, 0) * 1f).ToVector4() * 2,
                 //ReticleSize = 0.008f,
                 //FadeStartRatio = 0.5,
                 ReplaceModel = @"Models\Weapons\PrecisionRifle.mwm",
@@ -42,9 +42,17 @@ namespace Digi.BetterHoloSight
 
             AddGun("UltimateAutomaticRifleItem", new DrawSettings()
             {
-                ReticleColor = new Color(0, 255, 0).ToVector4() * 1,
+                ReticleColor = (new Color(0, 255, 0) * 1f).ToVector4() * 1,
                 ReticleSize = 0.01f,
                 ReplaceModel = @"Models\Weapons\UltimateRifle.mwm",
+            });
+
+            AddGun("ElitePistolItem", new DrawSettings()
+            {
+                ReticleColor = (new Color(255, 0, 0) * 0.75f).ToVector4() * 2,
+                ReticleSize = 0.001f,
+                ReticleMaterial = MyStringId.GetOrCompute("WhiteDot"),
+                ReplaceModel = @"Models\Weapons\ElitePistol.mwm",
             });
         }
 
