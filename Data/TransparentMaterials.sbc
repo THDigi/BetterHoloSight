@@ -9,21 +9,10 @@
       <AlphaMistingEnable>false</AlphaMistingEnable>
       <AlphaSaturation>1</AlphaSaturation>
       <CanBeAffectedByOtherLights>false</CanBeAffectedByOtherLights>
-      <Emissivity>0</Emissivity>
-      <IgnoreDepth>false</IgnoreDepth>
       <SoftParticleDistanceScale>0</SoftParticleDistanceScale>
       <Texture>Textures\Reticle.dds</Texture>
       <UseAtlas>false</UseAtlas>
-      <UVOffset>
-        <X>0</X>
-        <Y>0</Y>
-      </UVOffset>
-      <UVSize>
-        <X>1</X>
-        <Y>1</Y>
-      </UVSize>
     </TransparentMaterial>
-
     <TransparentMaterial>
       <Id>
         <TypeId>TransparentMaterialDefinition</TypeId>
@@ -32,31 +21,21 @@
       <AlphaMistingEnable>false</AlphaMistingEnable>
       <AlphaSaturation>1</AlphaSaturation>
       <CanBeAffectedByOtherLights>true</CanBeAffectedByOtherLights>
-      <IgnoreDepth>false</IgnoreDepth>
-      <SoftParticleDistanceScale>1</SoftParticleDistanceScale>
+      <SoftParticleDistanceScale>0</SoftParticleDistanceScale>
       <Texture>Textures\Particles\SquareWindowDirtInside_ca.dds</Texture>
       <GlossTexture>Textures\Models\Cubes\Chrome_ng.dds</GlossTexture>
       <UseAtlas>false</UseAtlas>
-      <NeedSort>true</NeedSort>
-      <UVOffset>
-        <X>0</X>
-        <Y>0</Y>
-      </UVOffset>
-      <UVSize>
-        <X>1</X>
-        <Y>1</Y>
-      </UVSize>
       <Color>
-        <X>1</X>
-        <Y>1</Y>
-        <Z>1</Z>
-        <W>0.01</W>
+        <X>1.0</X>
+        <Y>1.0</Y>
+        <Z>1.0</Z>
+        <W>0.25</W>
       </Color>
       <ColorAdd>
         <X>0</X>
         <Y>0</Y>
         <Z>0</Z>
-        <W>0</W>
+        <W>0.6</W>
       </ColorAdd>
       <ShadowMultiplier>
         <X>0</X>
@@ -65,17 +44,17 @@
         <W>0</W>
       </ShadowMultiplier>
       <LightMultiplier>
-        <X>0</X>
-        <Y>0</Y>
-        <Z>0</Z>
-        <W>0</W>
+        <X>0.01</X>
+        <Y>0.01</Y>
+        <Z>0.01</Z>
+        <W>0.01</W>
       </LightMultiplier>
-      <Reflectivity>0.3</Reflectivity>
-      <Fresnel>0.8</Fresnel>
-      <ReflectionShadow>0.3</ReflectionShadow>
-      <Gloss>0.7</Gloss>
+      <Reflectivity>0.01</Reflectivity>
+      <Fresnel>100</Fresnel>
+      <ReflectionShadow>0.5</ReflectionShadow>
+      <Gloss>0.6</Gloss>
       <GlossTextureAdd>0.6</GlossTextureAdd>
-      <SpecularColorFactor>12</SpecularColorFactor>
+      <SpecularColorFactor>20</SpecularColorFactor>
       <IsFlareOccluder>true</IsFlareOccluder>
     </TransparentMaterial>
   </TransparentMaterials>
